@@ -9,6 +9,21 @@ do Codex e do Claude Code.
 ./bin/dashboard
 ```
 
+Para abrir de qualquer diretório, instale o lançador uma vez:
+
+```bash
+./bin/install
+```
+
+Depois use:
+
+```bash
+ai-dashboard
+```
+
+O instalador cria `~/.local/bin/ai-dashboard`. Se `ai-dashboard` não for
+encontrado, inclua `~/.local/bin` no `PATH` da sua sessão.
+
 O comando exige sessões ativas de `codex login` e `claude auth login`. Ele não
 salva credenciais nem usa uma chave API. Caso uma sessão expire, autentique de
 novo no CLI correspondente e pressione `r`.
