@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+set -eu
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+mkdir -p "$HOME/.local/bin"
+ln -sfn "$script_dir/dashboard" "$HOME/.local/bin/ai-dashboard"
+
+printf '%s\n' 'Instalado: ai-dashboard'
