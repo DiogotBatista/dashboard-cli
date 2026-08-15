@@ -38,6 +38,8 @@ restante, contagem regressiva e data/hora local de reinício. Se um provedor
 falhar após uma leitura válida, os últimos valores ficam marcados como
 desatualizados.
 
+No Codex, a janela exibida é semanal (`7 dias`).
+
 ## Limite conhecido
 
 As rotas de uso de assinatura são contratos internos dos provedores. Se uma
