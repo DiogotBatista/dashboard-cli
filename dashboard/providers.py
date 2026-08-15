@@ -18,7 +18,7 @@ def parse_codex_usage(payload: dict) -> tuple[Window, ...]:
             remaining_percent=100 - int(window["used_percent"]),
             resets_at=datetime.fromtimestamp(window["reset_at"], timezone.utc).astimezone(),
         )
-        for name, key in (("5 h", "primary_window"), ("7 dias", "secondary_window"))
+        for name, key in (("7 dias", "primary_window"), ("7 dias", "secondary_window"))
         if (window := rate_limit.get(key))
     )
 

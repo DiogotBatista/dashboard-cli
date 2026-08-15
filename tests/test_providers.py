@@ -22,6 +22,7 @@ class ProviderParserTest(TestCase):
 
         windows = parse_codex_usage(payload)
 
+        self.assertEqual([window.name for window in windows], ["7 dias", "7 dias"])
         self.assertEqual([window.remaining_percent for window in windows], [62, 48])
 
     def test_parses_claude_five_hour_and_seven_day_windows(self):
