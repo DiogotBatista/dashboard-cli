@@ -36,7 +36,7 @@ dashboard-cli/
 │   ├── test_models.py
 │   ├── test_providers.py
 │   └── test_tui.py
-├── dashboard                  # lançador executável local: `./dashboard`
+├── bin/dashboard              # lançador executável local: `./bin/dashboard`
 └── README.md                  # instalação, uso e limites conhecidos
 ```
 
@@ -254,7 +254,7 @@ git commit -m "feat: fetch subscription usage"
 - Create: `dashboard/tui.py`
 - Create: `dashboard/__main__.py`
 - Create: `tests/test_tui.py`
-- Create: `dashboard`
+- Create: `bin/dashboard`
 
 **Interfaces:**
 - Consumes: `ProviderStatus`, `format_reset` e `fetch_all`.
@@ -307,7 +307,7 @@ ou ao receber `r`; encerre em `q`. Escreva as linhas com
 para terminais baixos/estreitos.
 
 Crie `dashboard/__main__.py` com `curses.wrapper(run)`. Crie o arquivo
-executável `dashboard`:
+executável `bin/dashboard`:
 
 ```sh
 #!/usr/bin/env sh
@@ -316,7 +316,7 @@ exec python3 -m dashboard "$@"
 
 - [ ] **Step 4: Executar os testes e verificar o lançador**
 
-Run: `python3 -m unittest discover -v && chmod +x dashboard && ./dashboard`
+Run: `python3 -m unittest discover -v && chmod +x bin/dashboard && ./bin/dashboard`
 
 Expected: todos os testes PASS; o TUI abre e `q` o encerra sem traceback.
 
@@ -333,7 +333,7 @@ git commit -m "feat: add live usage terminal dashboard"
 - Create: `README.md`
 
 **Interfaces:**
-- Consumes: o lançador `./dashboard` e a autenticação existente dos CLIs.
+- Consumes: o lançador `./bin/dashboard` e a autenticação existente dos CLIs.
 - Produces: instruções reproduzíveis de execução e recuperação de sessão expirada.
 
 - [ ] **Step 1: Escrever README focado em execução e limites**
@@ -344,7 +344,7 @@ Inclua exatamente:
 ## Uso
 
 ```bash
-./dashboard
+./bin/dashboard
 ```
 
 O comando exige sessões ativas de `codex login` e `claude auth login`. Ele não
@@ -374,7 +374,7 @@ Run:
 
 ```bash
 python3 -m unittest discover -v
-./dashboard
+./bin/dashboard
 ```
 
 Expected: testes PASS; TUI mostra cada provedor autenticado com suas janelas ou
