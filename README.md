@@ -1,35 +1,78 @@
 # Dashboard CLI
 
-Painel local, em terminal, para acompanhar as janelas de uso das assinaturas
-do Codex e do Claude Code.
+Painel local de terminal para acompanhar as janelas de uso das assinaturas do
+Codex e do Claude Code. Não usa chave de API e não salva credenciais.
 
-## Uso
+## Pré-requisitos
+
+- Linux ou macOS com `python3` instalado.
+- O CLI do Codex e/ou o Claude Code instalados e autenticados.
 
 ```bash
-./bin/dashboard
+codex login
+claude auth login
 ```
 
-Para abrir de qualquer diretório, instale o lançador uma vez:
+Você pode usar apenas um dos provedores: se o outro não estiver autenticado ou
+disponível, o painel continua mostrando o que conseguir consultar.
+
+## Instalação
+
+Clone o repositório e instale o lançador:
 
 ```bash
+git clone git@github.com:DiogotBatista/dashboard-cli.git
+cd dashboard-cli
 ./bin/install
 ```
 
-Depois use:
+O instalador cria `~/.local/bin/ai-dashboard`. Para que o comando funcione em
+todo novo terminal Bash, copie e execute esta linha uma única vez:
+
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+```
+
+Feche e abra o terminal, ou carregue a alteração agora:
+
+```bash
+source ~/.bashrc
+```
+
+## Primeiro uso
 
 ```bash
 ai-dashboard
 ```
 
-O instalador cria `~/.local/bin/ai-dashboard`. Se `ai-dashboard` não for
-encontrado, inclua `~/.local/bin` no `PATH` da sua sessão.
+Também é possível abrir o painel a partir da pasta do repositório, sem instalar
+o lançador:
 
-O comando exige sessões ativas de `codex login` e `claude auth login`. Ele não
-salva credenciais nem usa uma chave API. Caso uma sessão expire, autentique de
-novo no CLI correspondente e pressione `r`.
+```bash
+./bin/dashboard
+```
 
-O painel atualiza automaticamente a cada 60 segundos. Use `r` para atualizar
-imediatamente e `q` ou `Ctrl-C` para sair.
+## Comandos
+
+| Tecla | Ação |
+| --- | --- |
+| `r` | Atualiza os dados imediatamente. |
+| `q` ou `Ctrl-C` | Fecha o painel. |
+
+O painel atualiza automaticamente a cada 60 segundos.
+
+## Problemas comuns
+
+**`ai-dashboard: command not found`**
+
+Execute `source ~/.bashrc` ou abra outro terminal. Se usar Zsh, troque
+`~/.bashrc` por `~/.zshrc` no comando de instalação do `PATH`.
+
+**Um provedor aparece como indisponível**
+
+Faça login novamente no CLI correspondente (`codex login` ou `claude auth
+login`) e pressione `r`. Se houver uma leitura anterior válida, ela permanece
+na tela marcada como desatualizada.
 
 ## O que mostra
 
