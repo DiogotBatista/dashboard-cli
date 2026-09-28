@@ -21,25 +21,40 @@ def merge_statuses(
 
 
 def render_lines(
-    statuses: tuple[ProviderStatus, ...], now: datetime, next_fetch_at: datetime
+    statuses: tuple[ProviderStatus, ...],
+    now: datetime,
+    next_fetch_at: datetime,
+    refreshing: bool = False,
 ) -> list[str]:
     seconds = max(0, int((next_fetch_at - now).total_seconds()))
     lines = ["AI Usage Dashboard", "─" * 57]
 
+    if refreshing and not statuses:
+        statuses = (ProviderStatus("Codex"), ProviderStatus("Claude Code"))
+
     for status in statuses:
         lines.append(status.provider)
         if not status.windows:
-            lines.append(f"  indisponível · {status.error or 'sem dados'}")
+            lines.append(
+                "  consultando…"
+                if refreshing and not status.error
+                else f"  indisponível · {status.error or 'sem dados'}"
+            )
         for window in status.windows:
             countdown, reset_date = format_reset(window.resets_at, now)
-            stale = " · desatualizado" if status.error else ""
             lines.append(
                 f"  {window.name:<8}{100 - window.remaining_percent}% gasto · "
-                f"{window.remaining_percent}% restante     {countdown} · {reset_date}{stale}"
+                f"{window.remaining_percent}% restante"
             )
+            lines.append(f"          {countdown} · {reset_date}")
+        if status.windows and status.error:
+            lines.append(f"  desatualizado · {status.error}")
         lines.append("")
 
-    lines.append(f"[r] atualizar   [q] sair   próxima consulta em {seconds:02}s")
+    if refreshing:
+        lines.append("[q] sair   consultando…")
+    else:
+        lines.extend(("[r] atualizar   [q] sair", f"próxima consulta em {seconds:02}s"))
     return lines
 
 
@@ -67,7 +82,8 @@ def run(screen: curses.window) -> None:
 
             height, width = screen.getmaxyx()
             screen.erase()
-            for row, line in enumerate(render_lines(statuses, now, next_fetch_at)[:height]):
+            lines = render_lines(statuses, now, next_fetch_at, refreshing=refresh is not None)
+            for row, line in enumerate(lines[:height]):
                 try:
                     screen.addnstr(row, 0, line, max(0, width - 1))
                 except curses.error:
