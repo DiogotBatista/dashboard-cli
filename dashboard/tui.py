@@ -1,5 +1,6 @@
 import curses
 import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from datetime import datetime, timedelta
 
@@ -51,25 +52,33 @@ def run(screen: curses.window) -> None:
     screen.nodelay(True)
     statuses: tuple[ProviderStatus, ...] = ()
     next_fetch_at = datetime.now().astimezone()
+    executor = ThreadPoolExecutor(max_workers=1)
+    refresh = None
 
-    while True:
-        now = datetime.now().astimezone()
-        if now >= next_fetch_at:
-            statuses = merge_statuses(statuses, fetch_all())
-            next_fetch_at = now + timedelta(seconds=60)
+    try:
+        while True:
+            now = datetime.now().astimezone()
+            if refresh is not None and refresh.done():
+                statuses = merge_statuses(statuses, refresh.result())
+                refresh = None
+                next_fetch_at = now + timedelta(seconds=60)
+            if refresh is None and now >= next_fetch_at:
+                refresh = executor.submit(fetch_all)
 
-        height, width = screen.getmaxyx()
-        screen.erase()
-        for row, line in enumerate(render_lines(statuses, now, next_fetch_at)[:height]):
-            try:
-                screen.addnstr(row, 0, line, max(0, width - 1))
-            except curses.error:
-                pass
-        screen.refresh()
+            height, width = screen.getmaxyx()
+            screen.erase()
+            for row, line in enumerate(render_lines(statuses, now, next_fetch_at)[:height]):
+                try:
+                    screen.addnstr(row, 0, line, max(0, width - 1))
+                except curses.error:
+                    pass
+            screen.refresh()
 
-        key = screen.getch()
-        if key in (ord("q"), ord("Q")):
-            return
-        if key in (ord("r"), ord("R")):
-            next_fetch_at = now
-        time.sleep(0.1)
+            key = screen.getch()
+            if key in (ord("q"), ord("Q")):
+                return
+            if key in (ord("r"), ord("R")):
+                next_fetch_at = now
+            time.sleep(0.1)
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
