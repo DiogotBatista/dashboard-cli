@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -38,7 +37,7 @@ class ProviderParserTest(TestCase):
 
     @patch("dashboard.providers._request_json", side_effect=OSError("offline"))
     def test_fetch_returns_safe_error_without_raising(self, _request):
-        status = fetch_codex(datetime.now(timezone.utc))
+        status = fetch_codex()
 
         self.assertEqual(status.provider, "Codex")
         self.assertEqual(status.windows, ())
@@ -46,7 +45,7 @@ class ProviderParserTest(TestCase):
 
     @patch("dashboard.providers._request_json", side_effect=OSError("offline"))
     def test_fetch_claude_returns_safe_error_without_raising(self, _request):
-        status = fetch_claude(datetime.now(timezone.utc))
+        status = fetch_claude()
 
         self.assertEqual(status.provider, "Claude Code")
         self.assertEqual(status.windows, ())
@@ -55,10 +54,9 @@ class ProviderParserTest(TestCase):
     @patch("dashboard.providers.fetch_claude")
     @patch("dashboard.providers.fetch_codex")
     def test_fetches_providers_in_display_order(self, codex, claude):
-        now = datetime.now(timezone.utc)
         codex.return_value.provider = "Codex"
         claude.return_value.provider = "Claude Code"
 
-        statuses = fetch_all(now)
+        statuses = fetch_all()
 
         self.assertEqual([status.provider for status in statuses], ["Codex", "Claude Code"])

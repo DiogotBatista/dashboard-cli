@@ -1,8 +1,9 @@
 import curses
 import time
+from dataclasses import replace
 from datetime import datetime, timedelta
 
-from dashboard.models import ProviderStatus, format_reset, remaining_to_used
+from dashboard.models import ProviderStatus, format_reset
 from dashboard.providers import fetch_all
 
 
@@ -11,12 +12,7 @@ def merge_statuses(
 ) -> tuple[ProviderStatus, ...]:
     last_by_provider = {status.provider: status for status in previous}
     return tuple(
-        ProviderStatus(
-            provider=status.provider,
-            windows=last_by_provider[status.provider].windows,
-            fetched_at=last_by_provider[status.provider].fetched_at,
-            error=status.error,
-        )
+        replace(status, windows=last_by_provider[status.provider].windows)
         if status.error and not status.windows and status.provider in last_by_provider
         else status
         for status in current
@@ -37,7 +33,7 @@ def render_lines(
             countdown, reset_date = format_reset(window.resets_at, now)
             stale = " · desatualizado" if status.error else ""
             lines.append(
-                f"  {window.name:<8}{remaining_to_used(window.remaining_percent)}% gasto · "
+                f"  {window.name:<8}{100 - window.remaining_percent}% gasto · "
                 f"{window.remaining_percent}% restante     {countdown} · {reset_date}{stale}"
             )
         lines.append("")
@@ -59,7 +55,7 @@ def run(screen: curses.window) -> None:
     while True:
         now = datetime.now().astimezone()
         if now >= next_fetch_at:
-            statuses = merge_statuses(statuses, fetch_all(now))
+            statuses = merge_statuses(statuses, fetch_all())
             next_fetch_at = now + timedelta(seconds=60)
 
         height, width = screen.getmaxyx()

@@ -46,7 +46,7 @@ def _load_json(path: Path) -> dict:
         return json.load(source)
 
 
-def fetch_codex(now: datetime) -> ProviderStatus:
+def fetch_codex() -> ProviderStatus:
     try:
         tokens = _load_json(Path.home() / ".codex" / "auth.json")["tokens"]
         payload = _request_json(
@@ -56,12 +56,12 @@ def fetch_codex(now: datetime) -> ProviderStatus:
                 "ChatGPT-Account-Id": tokens["account_id"],
             },
         )
-        return ProviderStatus("Codex", parse_codex_usage(payload), now)
+        return ProviderStatus("Codex", parse_codex_usage(payload))
     except Exception:
         return ProviderStatus("Codex", error="consulta indisponível")
 
 
-def fetch_claude(now: datetime) -> ProviderStatus:
+def fetch_claude() -> ProviderStatus:
     try:
         oauth = _load_json(Path.home() / ".claude" / ".credentials.json")["claudeAiOauth"]
         payload = _request_json(
@@ -71,13 +71,13 @@ def fetch_claude(now: datetime) -> ProviderStatus:
                 "anthropic-beta": "oauth-2025-04-20",
             },
         )
-        return ProviderStatus("Claude Code", parse_claude_usage(payload), now)
+        return ProviderStatus("Claude Code", parse_claude_usage(payload))
     except Exception:
         return ProviderStatus("Claude Code", error="consulta indisponível")
 
 
-def fetch_all(now: datetime) -> tuple[ProviderStatus, ProviderStatus]:
+def fetch_all() -> tuple[ProviderStatus, ProviderStatus]:
     with ThreadPoolExecutor(max_workers=2) as executor:
-        codex = executor.submit(fetch_codex, now)
-        claude = executor.submit(fetch_claude, now)
+        codex = executor.submit(fetch_codex)
+        claude = executor.submit(fetch_claude)
         return codex.result(), claude.result()

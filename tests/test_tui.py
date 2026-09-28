@@ -13,7 +13,6 @@ class TuiTest(TestCase):
         status = ProviderStatus(
             "Codex",
             (Window("5 h", 62, datetime(2026, 8, 15, 19, 30, tzinfo=zone)),),
-            now,
         )
 
         lines = render_lines((status,), now, now)
@@ -33,7 +32,6 @@ class TuiTest(TestCase):
         previous = ProviderStatus(
             "Codex",
             (Window("5 h", 62, datetime(2026, 8, 15, 19, 30, tzinfo=zone)),),
-            datetime(2026, 8, 15, 17, 15, tzinfo=zone),
         )
         failed = ProviderStatus("Codex", error="consulta indisponível")
 

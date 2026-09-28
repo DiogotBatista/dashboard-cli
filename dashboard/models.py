@@ -13,12 +13,7 @@ class Window:
 class ProviderStatus:
     provider: str
     windows: tuple[Window, ...] = ()
-    fetched_at: datetime | None = None
     error: str | None = None
-
-
-def remaining_to_used(remaining_percent: int) -> int:
-    return 100 - remaining_percent
 
 
 def format_reset(resets_at: datetime, now: datetime) -> tuple[str, str]:
